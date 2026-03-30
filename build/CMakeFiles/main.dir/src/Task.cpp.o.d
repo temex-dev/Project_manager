@@ -1,7 +1,7 @@
-CMakeFiles/TaskManager.dir/src/main.cpp.o: \
- /home/tomas/Projects/Project_manager/src/main.cpp \
+CMakeFiles/main.dir/src/Task.cpp.o: \
+ /home/tomas/Projects/Project_manager/src/Task.cpp \
  /usr/include/stdc-predef.h \
- /home/tomas/Projects/Project_manager/src/../include/Terminal.h \
+ /home/tomas/Projects/Project_manager/src/../include/Task.h \
  /home/tomas/Projects/Project_manager/src/../include/../include/globals.h \
  /usr/include/c++/15.2.1/iostream \
  /usr/include/c++/15.2.1/bits/requires_hosted.h \
@@ -155,4 +155,8 @@ CMakeFiles/TaskManager.dir/src/main.cpp.o: \
  /usr/include/c++/15.2.1/bits/node_handle.h \
  /usr/include/c++/15.2.1/bits/stl_map.h \
  /usr/include/c++/15.2.1/bits/stl_multimap.h \
- /usr/include/c++/15.2.1/bits/erase_if.h
+ /usr/include/c++/15.2.1/bits/erase_if.h /usr/include/c++/15.2.1/vector \
+ /usr/include/c++/15.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/15.2.1/bits/stl_vector.h \
+ /usr/include/c++/15.2.1/bits/stl_bvector.h \
+ /usr/include/c++/15.2.1/bits/vector.tcc
