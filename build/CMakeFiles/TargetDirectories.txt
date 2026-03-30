@@ -1,3 +1,3 @@
-/home/tomas/Projects/Project_manager/build/CMakeFiles/TaskManager.dir
+/home/tomas/Projects/Project_manager/build/CMakeFiles/main.dir
 /home/tomas/Projects/Project_manager/build/CMakeFiles/edit_cache.dir
 /home/tomas/Projects/Project_manager/build/CMakeFiles/rebuild_cache.dir

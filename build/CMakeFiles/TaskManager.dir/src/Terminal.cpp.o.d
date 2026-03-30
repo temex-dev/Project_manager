@@ -1,8 +1,8 @@
 CMakeFiles/TaskManager.dir/src/Terminal.cpp.o: \
  /home/tomas/Projects/Project_manager/src/Terminal.cpp \
  /usr/include/stdc-predef.h \
- /home/tomas/Projects/Project_manager/include/Terminal.h \
- /home/tomas/Projects/Project_manager/include/../include/globals.h \
+ /home/tomas/Projects/Project_manager/src/../include/Terminal.h \
+ /home/tomas/Projects/Project_manager/src/../include/../include/globals.h \
  /usr/include/c++/15.2.1/iostream \
  /usr/include/c++/15.2.1/bits/requires_hosted.h \
  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -149,4 +149,10 @@ CMakeFiles/TaskManager.dir/src/Terminal.cpp.o: \
  /usr/include/c++/15.2.1/bits/ostream.tcc /usr/include/c++/15.2.1/istream \
  /usr/include/c++/15.2.1/bits/istream.tcc \
  /usr/include/c++/15.2.1/optional \
- /usr/include/c++/15.2.1/bits/enable_special_members.h
+ /usr/include/c++/15.2.1/bits/enable_special_members.h \
+ /usr/include/c++/15.2.1/map /usr/include/c++/15.2.1/bits/stl_tree.h \
+ /usr/include/c++/15.2.1/ext/aligned_buffer.h \
+ /usr/include/c++/15.2.1/bits/node_handle.h \
+ /usr/include/c++/15.2.1/bits/stl_map.h \
+ /usr/include/c++/15.2.1/bits/stl_multimap.h \
+ /usr/include/c++/15.2.1/bits/erase_if.h
