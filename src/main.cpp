@@ -12,6 +12,5 @@ int main() {
 
     Terminal::drawInfoBox(Type::Task, "Completed Task", "This task is completed.", "2024-12-31", Status::Completed, Priority::Low);
 
-    std::cout << "end";
     return 0;
 }
