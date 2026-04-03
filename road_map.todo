@@ -1,4 +1,0 @@
-[] TASK - taskId "T0023", title "name", description "do stuff", dueDate "24.12.2006", priority "Low/Medium/High", status "Done, InProgress, Todo", projectId "P003"
-[] PROJECT - projectId "P003", title "name", description "do stuff", tasks "name, name2, ...",
-[] MAIN MENU - display main menu, add tasks, add projects, edit, remove, filter
-[] DATABASE - save into .json ig
