@@ -2,6 +2,8 @@
 #define TERMINAL_H
 #pragma once
 #include "../include/globals.h"
+#include "../include/Task.h"
+#include "../include/Project.h"
 
 class Terminal {
 private:
@@ -17,7 +19,7 @@ public:
         std::string &title, std::string &desc, std::string &dueDate, const Status &status, const Priority &priority);
 
     static void drawInfoBox(const Type &type, const std::string &title, const
-        std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority);
+        std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks = std::nullopt);
 
     static void drawMenu();
 

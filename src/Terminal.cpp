@@ -98,25 +98,7 @@ void Terminal::moveCursor(const unsigned int &row, const unsigned int &col) {
 
 // ===== NOT FINISHED =====
 void Terminal::drawInfoBox(const Type &type, const std::string &title, const
-    std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority) {
-
-
-        class Task {
-            private:
-                std::string title;
-                public:
-                Task(const std::string &t) : title(t) {}
-                std::string getTitle() const { return title; }
-        };
-    struct Tasks {
-        Task *task;
-    };
-    Task test1("Task 1");
-    Task test2("Task 2");
-
-    Tasks testTask1 = {&test1};
-    Tasks testTask2 = {&test2};
-    std::vector<Tasks> tasks = {testTask1, testTask2};
+    std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks) {
 
     const std::string typeStr = (type == Type::Project) ? "Project" : "Task";
 
@@ -129,12 +111,15 @@ void Terminal::drawInfoBox(const Type &type, const std::string &title, const
     std::cout << "      │ "
         << Terminal::colorize("Description : ", Style::Bold)
         << Terminal::colorize(desc, Style::Italic) << "\n";
-    if (type == Type::Project) {
 
+    if (type == Type::Project && tasks.has_value()) {
         std::cout << "      │ "
             << Terminal::colorize("Tasks       : ", Style::Bold);
-            for (const auto &t : tasks) {
-            std::cout << Terminal::colorize(t.task->getTitle(), Style::Italic) << ", ";
+        for (const auto &t : tasks.value()) {
+            std::cout << Terminal::colorize(t.getTitle(), Style::Italic);
+            if (&t != &tasks.value().back()) {
+                std::cout << ", ";
+            }
         }
         std::cout << "\b\b " << std::endl;
     }

@@ -159,4 +159,6 @@ CMakeFiles/main.dir/src/Terminal.cpp.o: \
  /usr/include/c++/15.2.1/bits/stl_uninitialized.h \
  /usr/include/c++/15.2.1/bits/stl_vector.h \
  /usr/include/c++/15.2.1/bits/stl_bvector.h \
- /usr/include/c++/15.2.1/bits/vector.tcc
+ /usr/include/c++/15.2.1/bits/vector.tcc \
+ /home/tomas/Projects/Project_manager/src/../include/../include/Task.h \
+ /home/tomas/Projects/Project_manager/src/../include/../include/Project.h
