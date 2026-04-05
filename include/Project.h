@@ -6,19 +6,24 @@
 
 class Project {
 private:
+    std::string title;
     std::vector<Task> tasks;
-
+    Type type = Type::Project;
 public:
     void addTask(const Task &task) {
         tasks.push_back(task);
     }
 
     const std::vector<Task> &getTasks() const {
-        return tasks;
+        return this->tasks;
     }
 
     void clearTasks() {
         tasks.clear();
+    }
+
+    std::string getTitle() const {
+        return this->title;
     }
 };
 

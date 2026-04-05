@@ -100,11 +100,11 @@ void Terminal::moveCursor(const unsigned int &row, const unsigned int &col) {
 void Terminal::drawInfoBox(const Type &type, const std::string &title, const
     std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks) {
 
-    const std::string typeStr = (type == Type::Project) ? "Project" : "Task";
+    const std::string typeLabel = typeStr.at(type);
 
     std::cout << "      ┌───────────────────────────────┐\n";
     std::cout << "      │ "
-        << Terminal::colorize(typeStr, Style::Bold, Color::BrightBlue)
+        << Terminal::colorize(typeLabel, Style::Bold, Color::BrightBlue)
         << "\033[21G: "
         << Terminal::colorize(title, Style::Bold) << "\n";
     std::cout << "      ├───────────────────────────────┤\n";
@@ -133,6 +133,118 @@ void Terminal::drawInfoBox(const Type &type, const std::string &title, const
         << Terminal::colorize("Priority    : ", Style::Bold)
         << Terminal::colorize(priorityStr.at(priority), std::nullopt, priorityColors.at(priority).fg, priorityColors.at(priority).bg) << "\n";
     std::cout << "      └───────────────────────────────┘\n";
+}
+
+void Terminal::drawTaskCreateBox(const std::string &title, const
+    std::string &desc, const std::string &dueDate, const std::string &status,
+    const std::string &priority, const std::string &errorMessage) {
+
+    std::cout << "      ┌───────────────────────────────┐\n";
+    std::cout << "      │ "
+        << Terminal::colorize("Task", Style::Bold, Color::BrightBlue)
+        << "\033[21G: " << title << "\n";
+    std::cout << "      ├───────────────────────────────┤\n";
+    std::cout << "      │ "
+        << Terminal::colorize("Description : ", Style::Bold)
+        << desc << "\n";
+    std::cout << "      │ "
+        << Terminal::colorize("Due Date    : ", Style::Bold)
+        << dueDate << "\n";
+    std::cout << "      │ "
+        << Terminal::colorize("Status      : ", Style::Bold)
+        << Terminal::colorize(status, std::nullopt, statusColor.at(strStatus.at(status)).fg, statusColor.at(strStatus.at(status)).bg) << "\n";
+    std::cout << "      │ "
+        << Terminal::colorize("Priority    : ", Style::Bold)
+        << Terminal::colorize(priority, std::nullopt, priorityColors.at(strPriority.at(priority)).fg, priorityColors.at(strPriority.at(priority)).bg) << "\n";
+    std::cout << "      └───────────────────────────────┘\n";
+
+    if (!errorMessage.empty()) {
+        std::cout << "\n      "
+            << Terminal::colorize("Error: " + errorMessage, std::nullopt, Color::White, Color::Red)
+            << "\n";
+    }
+}
+
+void Terminal::drawInputBox(const Action &action, const Type &type, Project &
+    project) {
+    const std::string typeLabel = typeStr.at(type);
+    std::string title, desc, dueDate, status, priority;
+    std::string errorMessage;
+    if (typeLabel == "Task") {
+        switch(action) {
+            case Action::Create:
+                while(true) {
+                    Terminal::clearScreen();
+                    Terminal::drawTaskCreateBox(title, desc, dueDate, status, priority, errorMessage);
+                    errorMessage.clear();
+
+                    if (title.empty()) {
+                        Terminal::moveCursor(2, 23);
+                        std::getline(std::cin, title);
+                        continue;
+                    }
+                    if (desc.empty()) {
+                        Terminal::moveCursor(4, 23);
+                        std::getline(std::cin, desc);
+                        continue;
+                    }
+                    if (dueDate.empty()) {
+                        Terminal::moveCursor(5, 23);
+                        std::getline(std::cin, dueDate);
+                        continue;
+                    }
+                    if (status.empty()) {
+                        Terminal::moveCursor(6, 23);
+                        std::getline(std::cin, status);
+                        if (status != "Todo" && status != "InProgress" && status != "Completed") {
+                            status.clear();
+                            errorMessage = "Invalid status. Use Todo, InProgress, or Completed.";
+                            continue;
+                        }
+                        continue;
+                    }
+                    if (priority.empty()) {
+                        Terminal::moveCursor(7, 23);
+                        std::getline(std::cin, priority);
+                        if (priority != "Low" && priority != "Medium" && priority != "High") {
+                            priority.clear();
+                            errorMessage = "Invalid priority. Use Low, Medium, or High.";
+                            continue;
+                        }
+                        continue;
+                    }
+                    Terminal::createTaskInProject(title, desc, dueDate,
+                        strStatus.at(status), strPriority.at(priority), project);
+                    break;
+                }
+                break;
+            // case Action::Edit:
+
+            // case Action::Delete:
+
+            default:
+                std::cout << "Invalid action for input.\n";
+        }
+    }
+    std::cout << "\n      "
+        << Terminal::colorize("Can't create Project inside another Project '" + project.getTitle() + "'", std::nullopt, Color::White, Color::Red)
+        << "\n";
+}
+
+void Terminal::createTaskInProject(const std::string &title, const
+    std::string &desc, const std::string &dueDate, const Status &status,
+        const Priority &priority, Project &project) {
+            project.addTask(Task(title, desc, dueDate, status, priority));
+}
+
+void Terminal::editTaskInProject(const std::string &title, const
+    std::vector<Task> &tasks) {
+    // TODO: Implement task edit input box
+}
+
+void Terminal::deleteTaskInProject(const std::string &title, const
+    std::vector<Task> &tasks) {
+    // TODO: Implement task delete input box
 }
 
 void Terminal::drawMenu() {

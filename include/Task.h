@@ -9,7 +9,8 @@ private:
     std::string description;
     std::string dueDate;
     Status status;
-    Priority priority;
+    Priority priority; 
+    Type type = Type::Task;
 public:
     Task(const std::string &title, const std::string &description, const std::string &dueDate, const Status &status, const Priority &priority) :
         title(title), description(description), dueDate(dueDate), status(status), priority(priority) {}

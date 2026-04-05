@@ -12,11 +12,24 @@ private:
 
     static void moveCursor(const unsigned int &row, const unsigned int &col);
 
+
 public:
     static void clearScreen();
 
-    static void drawInputBox(const Type &type, const Action &action, const
-        std::string &title, std::string &desc, std::string &dueDate, const Status &status, const Priority &priority);
+    static void drawTaskCreateBox(const std::string &title,
+        const std::string &desc, const std::string &dueDate,
+        const std::string &status, const std::string &priority,
+        const std::string &errorMessage);
+
+    static void drawInputBox(const Action &action, const Type &type, Project &project);
+
+    static void createTaskInProject(const std::string &title, const
+        std::string &desc, const std::string &dueDate, const Status &status,
+            const Priority &priority, Project &project);
+    static void editTaskInProject(const std::string &title, const
+        std::vector<Task> &tasks);
+    static void deleteTaskInProject(const std::string &title,const
+        std::vector<Task> &tasks);
 
     static void drawInfoBox(const Type &type, const std::string &title, const
         std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks = std::nullopt);
