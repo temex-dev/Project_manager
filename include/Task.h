@@ -9,7 +9,7 @@ private:
     std::string description;
     std::string dueDate;
     Status status;
-    Priority priority; 
+    Priority priority;
     Type type = Type::Task;
 public:
     Task(const std::string &title, const std::string &description, const std::string &dueDate, const Status &status, const Priority &priority) :
@@ -21,7 +21,7 @@ public:
     std::string getDueDate() const { return this->dueDate; }
     Status getStatus() const { return this->status; }
     Priority getPriority() const { return this->priority; }
-
+    Type getType() const { return this->type; }
     // Setters
     void setTitle(const std::string &newTitle) { this->title = newTitle; }
     void setDescription(const std::string &newDescription) { this->description

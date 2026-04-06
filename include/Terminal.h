@@ -21,6 +21,8 @@ public:
         const std::string &status, const std::string &priority,
         const std::string &errorMessage);
 
+    static void drawTaskEditBox(Task &task, const std::string &errorMessage);
+
     static void drawInputBox(const Action &action, const Type &type, Project &project);
 
     static void createTaskInProject(const std::string &title, const

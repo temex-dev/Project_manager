@@ -24,11 +24,9 @@ int main() {
     Terminal::drawInputBox(Action::Create, Type::Project, project);
     std::vector<Task> tasks = project.getTasks();
     for (const auto &t : tasks) {
-        std::cout << "Title: " << t.getTitle() << "\n";
-        std::cout << "Description: " << t.getDescription() << "\n";
-        std::cout << "Due Date: " << t.getDueDate() << "\n";
-        std::cout << "Status: " << statusStr.at(t.getStatus()) << "\n";
-        std::cout << "Priority: " << priorityStr.at(t.getPriority()) << "\n";
+        Terminal::drawInfoBox(t.getType(), t.getTitle(),
+            t.getDescription(), t.getDueDate(), t.getStatus(), t.getPriority());
     }
+
     return 0;
 }

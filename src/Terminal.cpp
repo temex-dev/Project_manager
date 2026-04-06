@@ -96,7 +96,6 @@ void Terminal::moveCursor(const unsigned int &row, const unsigned int &col) {
     std::cout << "\033[" << row << ";" << col << "H";
 }
 
-// ===== NOT FINISHED =====
 void Terminal::drawInfoBox(const Type &type, const std::string &title, const
     std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks) {
 
@@ -174,6 +173,11 @@ void Terminal::drawTaskCreateBox(const std::string &title, const
     }
 }
 
+void Terminal::drawTaskEditBox(Task &task, const std::string &errorMessage) {
+    Terminal::drawInfoBox(task.getType(), task.getTitle(), task.getDescription(), task.getDueDate(), task.getStatus(), task.getPriority());
+
+}
+
 void Terminal::drawInputBox(const Action &action, const Type &type, Project &
     project) {
     const std::string typeLabel = typeStr.at(type);
@@ -227,7 +231,7 @@ void Terminal::drawInputBox(const Action &action, const Type &type, Project &
                     break;
                 }
                 break;
-            // case Action::Edit:
+            case Action::Edit:
 
             // case Action::Delete:
 
