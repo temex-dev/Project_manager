@@ -151,11 +151,20 @@ void Terminal::drawTaskCreateBox(const std::string &title, const
         << Terminal::colorize("Due Date    : ", Style::Bold)
         << dueDate << "\n";
     std::cout << "      │ "
-        << Terminal::colorize("Status      : ", Style::Bold)
-        << Terminal::colorize(status, std::nullopt, statusColor.at(strStatus.at(status)).fg, statusColor.at(strStatus.at(status)).bg) << "\n";
+        << Terminal::colorize("Status      : ", Style::Bold);
+    if (strStatus.count(status)) {
+        std::cout<< Terminal::colorize(status, std::nullopt,
+            statusColor.at(strStatus.at(status)).fg, statusColor.at(strStatus.at(status)).bg) << "\n";
+    }
+    else { std::cout << status << std::endl; }
+
     std::cout << "      │ "
-        << Terminal::colorize("Priority    : ", Style::Bold)
-        << Terminal::colorize(priority, std::nullopt, priorityColors.at(strPriority.at(priority)).fg, priorityColors.at(strPriority.at(priority)).bg) << "\n";
+        << Terminal::colorize("Priority    : ", Style::Bold);
+    if (strPriority.count(priority)) {
+        std::cout << Terminal::colorize(priority, std::nullopt,
+            priorityColors.at(strPriority.at(priority)).fg, priorityColors.at(strPriority.at(priority)).bg) << "\n";
+    }
+    else { std::cout << priority << std::endl; }
     std::cout << "      └───────────────────────────────┘\n";
 
     if (!errorMessage.empty()) {
