@@ -236,7 +236,8 @@ void Terminal::drawInputBox(const Action &action, const Type &type, Project &
             // case Action::Delete:
 
             default:
-                std::cout << "Invalid action for input.\n";
+            std::cout << "\n      "
+                << Terminal::colorize("This isn't a valid action for input.", std::nullopt, Color::White, Color::Red) << "\n";
         }
     }
     std::cout << "\n      "
@@ -261,31 +262,120 @@ void Terminal::deleteTaskInProject(const std::string &title, const
 }
 
 void Terminal::drawMenu() {
-    char input;
-    std::cout << "      ┌───────────────────────────────┐\n";
-    std::cout << "      │ "
-        << Terminal::colorize("Menu", Style::Bold, Color::BrightBlue)
-        << "\033[15G: "
-        << Terminal::colorize("Select an option", Style::Bold) << "      │\n";
-    std::cout << "      ├───────────────────────────────┤\n";
-    std::cout << "      │ "
-        << Terminal::colorize("1. Create Task", Style::Bold) << "                │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("2. Create Project", Style::Bold) << "             │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("3. View Tasks/Projects", Style::Bold) << "        │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("4. Edit Task/Project", Style::Bold) << "          │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("5. Delete Task/Project", Style::Bold) << "        │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("6. Help", Style::Bold) << "                       │\n";
-    std::cout << "      │ "
-        << Terminal::colorize("7. Exit", Style::Bold) << "                       │\n";
-    std::cout << "      ├───────────────────────────────┤\n";
-    std::cout << "      │ #\n";
-    std::cout << "      └───────────────────────────────┘\n";
-    Terminal::moveCursor(12, 11);
-    std::cin >> input;
-    Terminal::clearScreen();
+    std::string errorMsg;
+    unsigned int input;
+
+    while (true) {
+        Terminal::clearScreen();
+
+        std::cout << "      ┌───────────────────────────────┐\n";
+        std::cout << "      │ "
+            << Terminal::colorize("Menu", Style::Bold, Color::BrightBlue)
+            << "\033[15G: "
+            << Terminal::colorize("Select an option", Style::Bold) << "      │\n";
+        std::cout << "      ├───────────────────────────────┤\n";
+        std::cout << "      │ "
+            << Terminal::colorize("1. Create Task/Project", Style::Bold) << "        │\n";
+        std::cout << "      │ "
+            << Terminal::colorize("2. View Tasks/Projects", Style::Bold) << "        │\n";
+        std::cout << "      │ "
+            << Terminal::colorize("3. Edit Task/Project", Style::Bold) << "          │\n";
+        std::cout << "      │ "
+            << Terminal::colorize("4. Delete Task/Project", Style::Bold) << "        │\n";
+        std::cout << "      │ "
+            << Terminal::colorize("5. Help", Style::Bold) << "                       │\n";
+        std::cout << "      │ "
+            << Terminal::colorize("6. Exit", Style::Bold) << "                       │\n";
+        std::cout << "      ├───────────────────────────────┤\n";
+        std::cout << "      │ # " << Terminal::colorize("Enter number", Style::Dim) << "\n";
+        std::cout << "      └───────────────────────────────┘\n";
+
+        if (!errorMsg.empty()) {
+            std::cout << "\n      "
+                << Terminal::colorize(errorMsg, std::nullopt, Color::White, Color::Red) << "\n";
+        }
+
+        Terminal::moveCursor(11, 11);
+        std::cin >> input;
+
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore();
+            errorMsg = "Invalid input — please enter a number.";
+            continue;
+        }
+
+        if (input >= 1 && input <= 6) {
+            Terminal::clearScreen();
+            std::string errorMsg2;
+            unsigned int input2;
+            switch (input) {
+                case 1:
+                    while(true) {
+                        Terminal::clearScreen();
+                        std::cout << "      ┌───────────────────────────────┐\n";
+                        std::cout << "      │ "
+                            << Terminal::colorize("Submenu", Style::Bold, Color::BrightBlue)
+                            << "\033[16G: "
+                            << Terminal::colorize("Select an option", Style::Bold) << "     │\n";
+                        std::cout << "      ├───────────────────────────────┤\n";
+                        std::cout << "      │ "
+                            << Terminal::colorize("1. Create Project", Style::Bold) << "             │\n";
+                        std::cout << "      │ "
+                            << Terminal::colorize("2. Create Task", Style::Bold) << "                │\n";
+                        std::cout << "      ├───────────────────────────────┤\n";
+                        std::cout << "      │ # " << Terminal::colorize("Enter number", Style::Dim) << "\n";
+                        std::cout << "      └───────────────────────────────┘\n";
+
+                        if (!errorMsg.empty()) {
+                            std::cout << "\n      "
+                                << Terminal::colorize(errorMsg, std::nullopt, Color::White, Color::Red) << "\n";
+                        }
+
+                        Terminal::moveCursor(7, 11);
+                        std::cin >> input;
+
+                        if (std::cin.fail()) {
+                            std::cin.clear();
+                            std::cin.ignore();
+                            errorMsg = "Invalid input — please enter a number.";
+                            continue;
+                        }
+
+                        if (input2 <= 0 || input2 > 2) {
+                            errorMsg = "This isn't a valid action for input.";
+                            continue;
+                        }
+
+                        switch(input2) {
+                            case 1:
+                                Terminal::drawInputBox(Action::Create, Type::Project);
+                                break;
+                            case 2:
+                                std::cout << "jakej project vis co\n";
+                                Terminal::drawInputBox(Action::Create, Type::Task, &project);
+                                break;
+                        }
+                    }
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+
+                    break;
+                case 6:
+                    std::cout << "Exiting...\nTemex na to uz nema...\n";
+                    exit(0);
+            }
+        } else {
+            errorMsg = "This isn't a valid action for input.";
+        }
+    }
 }
