@@ -231,7 +231,8 @@ void Terminal::drawInputBox(const Action &action, const Type &type, Project &
                     break;
                 }
                 break;
-            case Action::Edit:
+
+            // case Action::Edit:
 
             // case Action::Delete:
 
@@ -243,6 +244,18 @@ void Terminal::drawInputBox(const Action &action, const Type &type, Project &
     std::cout << "\n      "
         << Terminal::colorize("Can't create Project inside another Project '" + project.getTitle() + "'", std::nullopt, Color::White, Color::Red)
         << "\n";
+}
+
+void Terminal::drawInputBox(const Action &action, const Type &type) {
+    const std::string typeLabel = typeStr.at(type);
+    std::string title, desc, dueDate, status, priority;
+    std::string errorMessage;
+    if (typeLabel == "Project") {
+        // Placeholder for Project creation
+        std::cout << "Project creation not yet implemented.\n";
+    } else {
+        std::cout << "Invalid type for this function.\n";
+    }
 }
 
 void Terminal::createTaskInProject(const std::string &title, const
@@ -261,7 +274,7 @@ void Terminal::deleteTaskInProject(const std::string &title, const
     // TODO: Implement task delete input box
 }
 
-void Terminal::drawMenu() {
+void Terminal::drawMenu(Project &project) {
     std::string errorMsg;
     unsigned int input;
 
@@ -323,6 +336,8 @@ void Terminal::drawMenu() {
                             << Terminal::colorize("1. Create Project", Style::Bold) << "             │\n";
                         std::cout << "      │ "
                             << Terminal::colorize("2. Create Task", Style::Bold) << "                │\n";
+                        std::cout << "      │ "
+                            << Terminal::colorize("3. Go back", Style::Bold) << "                    │\n";
                         std::cout << "      ├───────────────────────────────┤\n";
                         std::cout << "      │ # " << Terminal::colorize("Enter number", Style::Dim) << "\n";
                         std::cout << "      └───────────────────────────────┘\n";
@@ -332,7 +347,7 @@ void Terminal::drawMenu() {
                                 << Terminal::colorize(errorMsg, std::nullopt, Color::White, Color::Red) << "\n";
                         }
 
-                        Terminal::moveCursor(7, 11);
+                        Terminal::moveCursor(8, 11);
                         std::cin >> input;
 
                         if (std::cin.fail()) {
@@ -342,20 +357,23 @@ void Terminal::drawMenu() {
                             continue;
                         }
 
-                        if (input2 <= 0 || input2 > 2) {
+                        if (input < 1 || input > 3) {
                             errorMsg = "This isn't a valid action for input.";
                             continue;
                         }
 
-                        switch(input2) {
+                        switch(input) {
                             case 1:
                                 Terminal::drawInputBox(Action::Create, Type::Project);
                                 break;
                             case 2:
-                                std::cout << "jakej project vis co\n";
-                                Terminal::drawInputBox(Action::Create, Type::Task, &project);
+                                Terminal::drawInputBox(Action::Create, Type::Task, project);
                                 break;
-                        }
+                            case 3:
+                                Terminal::clearScreen();
+                                Terminal::drawMenu(project);
+                                break;
+                            }
                     }
                     break;
                 case 2:

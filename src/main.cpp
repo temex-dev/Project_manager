@@ -7,7 +7,7 @@ int main() {
 
     Project project;
 
-    Terminal::drawMenu();
+    Terminal::drawMenu(project);
 
     // Terminal::drawInputBox(Action::Create, Type::Task, project);
     // Terminal::drawInputBox(Action::Create, Type::Task, project);

@@ -25,6 +25,8 @@ public:
 
     static void drawInputBox(const Action &action, const Type &type, Project &project);
 
+    static void drawInputBox(const Action &action, const Type &type);
+
     static void createTaskInProject(const std::string &title, const
         std::string &desc, const std::string &dueDate, const Status &status,
         const Priority &priority, Project &project);
@@ -36,7 +38,7 @@ public:
     static void drawInfoBox(const Type &type, const std::string &title, const
         std::string &desc, const std::string &dueDate, const Status &status, const Priority &priority, const std::optional<std::vector<Task>> &tasks = std::nullopt);
 
-    static void drawMenu();
+    static void drawMenu(Project &project);
 
     static void print(const std::string &text, const
         std::optional<std::string> &styles = std::nullopt, const std::optional<Color> &fg = std::nullopt, const std::optional<Color> &bg = std::nullopt);
