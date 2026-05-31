@@ -1,5 +1,10 @@
 #include "../include/Terminal.h"
 
+#include <fstream>
+#include <filesystem>
+#include <iterator>
+#include <limits>
+
 
 unsigned int Terminal::toFgCode(const Color &c) {
     switch (c) {
@@ -52,6 +57,82 @@ std::string Terminal::buildStyleCodes(const std::string &styles) {
     }
     return codes;
 }
+
+static std::string trimString(const std::string &value) {
+    const auto begin = value.find_first_not_of(" \t\r\n");
+    if (begin == std::string::npos) {
+        return "";
+    }
+    const auto end = value.find_last_not_of(" \t\r\n");
+    return value.substr(begin, end - begin + 1);
+}
+
+static std::string jsonEscape(const std::string &value) {
+    std::string escaped;
+    escaped.reserve(value.size());
+    for (char c : value) {
+        switch (c) {
+            case '"': escaped += "\\\""; break;
+            case '\\': escaped += "\\\\"; break;
+            case '\b': escaped += "\\b"; break;
+            case '\f': escaped += "\\f"; break;
+            case '\n': escaped += "\\n"; break;
+            case '\r': escaped += "\\r"; break;
+            case '\t': escaped += "\\t"; break;
+            default: escaped += c; break;
+        }
+    }
+    return escaped;
+}
+
+static bool appendJsonObjectToArrayFile(const std::string &filePath, const std::string &jsonObject) {
+    std::filesystem::path path(filePath);
+    std::filesystem::create_directories(path.parent_path());
+
+    std::string content;
+    if (std::filesystem::exists(path)) {
+        std::ifstream in(path);
+        content.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+    }
+
+    const std::string trimmed = trimString(content);
+    std::string output;
+
+    if (trimmed.empty()) {
+        output = "[" + jsonObject + "]";
+    } else {
+        const auto insertPos = trimmed.find_last_not_of(" \t\r\n");
+        if (insertPos == std::string::npos || trimmed[insertPos] != ']') {
+            return false;
+        }
+
+        output = trimmed.substr(0, insertPos);
+        if (output.back() == '[') {
+            output += jsonObject;
+        } else {
+            output += "," + jsonObject;
+        }
+        output += "]";
+    }
+
+    std::ofstream out(path, std::ios::trunc);
+    if (!out.is_open()) {
+        return false;
+    }
+    out << output;
+    return true;
+}
+
+bool Terminal::saveTaskToFile(const Task &task, const std::optional<std::string> &projectTitle) {
+    std::string dir = DATA_DIR;
+    return appendJsonObjectToArrayFile(dir + "/tasks.json", task.toJson(projectTitle));
+}
+
+bool Terminal::saveProjectToFile(const Project &project) {
+    std::string dir = DATA_DIR;
+    return appendJsonObjectToArrayFile(dir + "/projects.json", project.toJson());
+}
+
 void Terminal::print(const std::string &text, const std::optional<std::string> &
     styles, const std::optional<Color> &fg, const std::optional<Color> &bg) {
 
@@ -251,8 +332,48 @@ void Terminal::drawInputBox(const Action &action, const Type &type) {
     std::string title, desc, dueDate, status, priority;
     std::string errorMessage;
     if (typeLabel == "Project") {
-        // Placeholder for Project creation
-        std::cout << "Project creation not yet implemented.\n";
+        while (true) {
+            Terminal::clearScreen();
+            std::cout << "      ┌───────────────────────────────┐\n";
+            std::cout << "      │ "
+                << Terminal::colorize("Project", Style::Bold, Color::BrightBlue)
+                << "\033[21G: " << title << "\n";
+            std::cout << "      ├───────────────────────────────┤\n";
+            std::cout << "      │ "
+                << Terminal::colorize("Title       : ", Style::Bold)
+                << title << "\n";
+            std::cout << "      └───────────────────────────────┘\n";
+
+            if (!errorMessage.empty()) {
+                std::cout << "\n      "
+                    << Terminal::colorize(errorMessage, std::nullopt, Color::White, Color::Red)
+                    << "\n";
+            }
+
+            if (title.empty()) {
+                Terminal::moveCursor(2, 23);
+                std::getline(std::cin, title);
+                if (title.empty()) {
+                    errorMessage = "Title is required.";
+                    continue;
+                }
+            }
+
+            Project project;
+            project.setTitle(title);
+            if (!Terminal::saveProjectToFile(project)) {
+                errorMessage = "Unable to save project to data/projects.json.";
+                title.clear();
+                continue;
+            }
+
+            std::cout << "\n      "
+                << Terminal::colorize("Project created and saved to data/projects.json.", Style::Bold, Color::BrightGreen)
+                << "\n";
+            std::cout << "\n      Press Enter to continue...";
+            std::getline(std::cin, errorMessage);
+            break;
+        }
     } else {
         std::cout << "Invalid type for this function.\n";
     }
@@ -261,7 +382,12 @@ void Terminal::drawInputBox(const Action &action, const Type &type) {
 void Terminal::createTaskInProject(const std::string &title, const
     std::string &desc, const std::string &dueDate, const Status &status,
         const Priority &priority, Project &project) {
-            project.addTask(Task(title, desc, dueDate, status, priority));
+    Task task(title, desc, dueDate, status, priority);
+    project.addTask(task);
+    const std::optional<std::string> projectTitle = project.getTitle().empty() ? std::nullopt : std::make_optional(project.getTitle());
+    if (!Terminal::saveTaskToFile(task, projectTitle)) {
+        std::cerr << "Warning: unable to save task to data/tasks.json\n";
+    }
 }
 
 void Terminal::editTaskInProject(const std::string &title, const
@@ -310,10 +436,11 @@ void Terminal::drawMenu(Project &project) {
 
         Terminal::moveCursor(11, 11);
         std::cin >> input;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         if (std::cin.fail()) {
             std::cin.clear();
-            std::cin.ignore();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             errorMsg = "Invalid input — please enter a number.";
             continue;
         }
@@ -339,7 +466,8 @@ void Terminal::drawMenu(Project &project) {
                         std::cout << "      │ "
                             << Terminal::colorize("3. Go back", Style::Bold) << "                    │\n";
                         std::cout << "      ├───────────────────────────────┤\n";
-                        std::cout << "      │ # " << Terminal::colorize("Enter number", Style::Dim) << "\n";
+                        std::cout << "      │ # " << Terminal::colorize
+                            ("Enter number", Style::Dim) << "\n";
                         std::cout << "      └───────────────────────────────┘\n";
 
                         if (!errorMsg.empty()) {
@@ -349,6 +477,7 @@ void Terminal::drawMenu(Project &project) {
 
                         Terminal::moveCursor(8, 11);
                         std::cin >> input;
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                         if (std::cin.fail()) {
                             std::cin.clear();
@@ -364,12 +493,15 @@ void Terminal::drawMenu(Project &project) {
 
                         switch(input) {
                             case 1:
+                            //create project
                                 Terminal::drawInputBox(Action::Create, Type::Project);
                                 break;
                             case 2:
+                            //create task
                                 Terminal::drawInputBox(Action::Create, Type::Task, project);
                                 break;
                             case 3:
+                            //go back
                                 Terminal::clearScreen();
                                 Terminal::drawMenu(project);
                                 break;

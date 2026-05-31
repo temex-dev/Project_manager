@@ -22,7 +22,39 @@ public:
     Status getStatus() const { return this->status; }
     Priority getPriority() const { return this->priority; }
     Type getType() const { return this->type; }
-    // Setters
+
+    static std::string jsonEscape(const std::string &value) {
+        std::string escaped;
+        escaped.reserve(value.size());
+        for (char c : value) {
+            switch (c) {
+                case '\"': escaped += "\\\""; break;
+                case '\\': escaped += "\\\\"; break;
+                case '\b': escaped += "\\b"; break;
+                case '\f': escaped += "\\f"; break;
+                case '\n': escaped += "\\n"; break;
+                case '\r': escaped += "\\r"; break;
+                case '\t': escaped += "\\t"; break;
+                default: escaped += c; break;
+            }
+        }
+        return escaped;
+    }
+
+    std::string toJson(const std::optional<std::string> &projectTitle = std::nullopt) const {
+        std::string json = "{";
+        json += "\"title\":\"" + jsonEscape(title) + "\",";
+        json += "\"description\":\"" + jsonEscape(description) + "\",";
+        json += "\"dueDate\":\"" + jsonEscape(dueDate) + "\",";
+        json += "\"status\":\"" + statusStr.at(status) + "\",";
+        json += "\"priority\":\"" + priorityStr.at(priority) + "\"";
+        if (projectTitle.has_value()) {
+            json += ",\"projectTitle\":\"" + jsonEscape(projectTitle.value()) + "\"";
+        }
+        json += "}";
+        return json;
+    }
+// Setters
     void setTitle(const std::string &newTitle) { this->title = newTitle; }
     void setDescription(const std::string &newDescription) { this->description
         = newDescription; }

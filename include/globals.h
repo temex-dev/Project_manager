@@ -8,8 +8,6 @@
 #include <map>
 #include <vector>
 
-
-
 enum class Color {
     Black, Red, Green, Yellow, Blue, Magenta, Cyan, White,
     BrightRed, BrightGreen, BrightYellow, BrightBlue
@@ -33,6 +31,12 @@ enum class Priority {
 struct ColorPair{
     Color fg;
     Color bg;
+};
+
+const std::map<int, std::string> test = {
+    {1, "One"},
+    {2, "Two"},
+    {3, "Three"}
 };
 
 const std::map<Priority, ColorPair> priorityColors = {

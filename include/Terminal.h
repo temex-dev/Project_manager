@@ -30,6 +30,8 @@ public:
     static void createTaskInProject(const std::string &title, const
         std::string &desc, const std::string &dueDate, const Status &status,
         const Priority &priority, Project &project);
+    static bool saveTaskToFile(const Task &task, const std::optional<std::string> &projectTitle = std::nullopt);
+    static bool saveProjectToFile(const Project &project);
     static void editTaskInProject(const std::string &title, const
         std::vector<Task> &tasks);
     static void deleteTaskInProject(const std::string &title,const
