@@ -1,10 +1,6 @@
 #include "../include/Terminal.h"
 
-#include <fstream>
-#include <filesystem>
-#include <iterator>
-#include <limits>
-
+const std::string dir = DATA_DIR;
 
 unsigned int Terminal::toFgCode(const Color &c) {
     switch (c) {
@@ -85,7 +81,8 @@ static std::string jsonEscape(const std::string &value) {
     return escaped;
 }
 
-static bool appendJsonObjectToArrayFile(const std::string &filePath, const std::string &jsonObject) {
+static bool appendJsonObjectToArrayFile(const std::string &filePath, const
+    std::string &jsonObject) {
     std::filesystem::path path(filePath);
     std::filesystem::create_directories(path.parent_path());
 
@@ -124,12 +121,10 @@ static bool appendJsonObjectToArrayFile(const std::string &filePath, const std::
 }
 
 bool Terminal::saveTaskToFile(const Task &task, const std::optional<std::string> &projectTitle) {
-    std::string dir = DATA_DIR;
     return appendJsonObjectToArrayFile(dir + "/tasks.json", task.toJson(projectTitle));
 }
 
 bool Terminal::saveProjectToFile(const Project &project) {
-    std::string dir = DATA_DIR;
     return appendJsonObjectToArrayFile(dir + "/projects.json", project.toJson());
 }
 
@@ -509,7 +504,64 @@ void Terminal::drawMenu(Project &project) {
                     }
                     break;
                 case 2:
+                    Terminal::clearScreen();
+                    std::cout << "      ┌───────────────────────────────┐\n";
+                    std::cout << "      │ "
+                        << Terminal::colorize("Submenu", Style::Bold, Color::BrightBlue)
+                        << "\033[16G: "
+                        << Terminal::colorize("Select an option", Style::Bold) << "     │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ "
+                        << Terminal::colorize("1. View Projects", Style::Bold) << "              │\n";
+                    std::cout << "      │ "
+                        << Terminal::colorize("2. View Tasks", Style::Bold) << "                 │\n";
+                    std::cout << "      │ "
+                        << Terminal::colorize("3. Go back", Style::Bold) << "                    │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ # " << Terminal::colorize
+                        ("Enter number", Style::Dim) << "\n";
+                    std::cout << "      └───────────────────────────────┘\n";
 
+                    if (!errorMsg.empty()) {
+                        std::cout << "\n      "
+                            << Terminal::colorize(errorMsg, std::nullopt, Color::White, Color::Red) << "\n";
+                    }
+
+                    Terminal::moveCursor(8, 11);
+                    std::cin >> input;
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+                    if (std::cin.fail()) {
+                        std::cin.clear();
+                        std::cin.ignore();
+                        errorMsg = "Invalid input — please enter a number.";
+                        continue;
+                    }
+
+                    if (input < 1 || input > 3) {
+                        errorMsg = "This isn't a valid action for input.";
+                        continue;
+                    }
+
+                    switch (input) {
+                        case 1:
+                        //view projects
+                            break;
+                        case 2:
+                        //view tasks
+                            for (const auto &t : project.getTasks()) {
+                                Terminal::drawInfoBox(t.getType(), t.getTitle(), t.getDescription(), t.getDueDate(), t.getStatus(), t.getPriority());
+                            }
+                            break;
+                        case 3:
+                        //go back
+                            Terminal::clearScreen();
+                            Terminal::drawMenu(project);
+                            break;
+                        default:
+                                std::cout << "Invalid option.\n";
+                                break;
+                    }
                     break;
                 case 3:
 
