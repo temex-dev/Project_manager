@@ -8,8 +8,11 @@ add_compile_definitions(DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 
 include_directories(include)
 
+
 add_executable(main
     src/main.cpp
     src/Terminal.cpp
     src/Task.cpp
 )
+
+target_link_libraries(main PRIVATE jsoncpp)

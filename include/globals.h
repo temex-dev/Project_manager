@@ -9,7 +9,7 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
-
+#include <json/json.h>
 
 
 enum class Color {
@@ -80,4 +80,17 @@ const std::map<Type, std::string> typeStr = {
     {Type::Task, "Task"}
 };
 
+inline Json::Value load_projects() {
+    std::ifstream projects_file(DATA_DIR "/projects.json", std::ifstream::binary);
+    Json::Value projects;
+    projects_file >> projects;
+    return projects;
+}
+
+inline Json::Value load_tasks() {
+    std::ifstream tasks_file(DATA_DIR "/tasks.json", std::ifstream::binary);
+    Json::Value tasks;
+    tasks_file >> tasks;
+    return tasks;
+}
 #endif // GLOBALS_H

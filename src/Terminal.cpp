@@ -1,4 +1,5 @@
 #include "../include/Terminal.h"
+#include "globals.h"
 
 const std::string dir = DATA_DIR;
 
@@ -445,6 +446,7 @@ void Terminal::drawMenu(Project &project) {
             std::string errorMsg2;
             unsigned int input2;
             switch (input) {
+//create task/project
                 case 1:
                     while(true) {
                         Terminal::clearScreen();
@@ -503,6 +505,7 @@ void Terminal::drawMenu(Project &project) {
                             }
                     }
                     break;
+//view tasks/projects
                 case 2:
                     Terminal::clearScreen();
                     std::cout << "      ┌───────────────────────────────┐\n";
@@ -544,17 +547,19 @@ void Terminal::drawMenu(Project &project) {
                     }
 
                     switch (input) {
-                        case 1:
-                        //view projects
+                        case 1:     //view projects
+                            Terminal::clearScreen();
+                            Terminal::print(load_projects().toStyledString());
+                            std::cout << Terminal::colorize("Press any key to continue...", Style::Dim) << "\n";
+                            std::cin >> input2;
                             break;
-                        case 2:
-                        //view tasks
-                            for (const auto &t : project.getTasks()) {
-                                Terminal::drawInfoBox(t.getType(), t.getTitle(), t.getDescription(), t.getDueDate(), t.getStatus(), t.getPriority());
-                            }
+                        case 2:     //view tasks
+                            Terminal::clearScreen();
+                            Terminal::print(load_tasks().toStyledString());
+                            std::cout << Terminal::colorize("Press any key to continue...", Style::Dim) << "\n";
+                            std::cin >> input2;
                             break;
-                        case 3:
-                        //go back
+                        case 3:     //go back
                             Terminal::clearScreen();
                             Terminal::drawMenu(project);
                             break;
@@ -563,15 +568,19 @@ void Terminal::drawMenu(Project &project) {
                                 break;
                     }
                     break;
+//edit tasks/projects
                 case 3:
 
                     break;
+//delete tasks/projects
                 case 4:
 
                     break;
+//help
                 case 5:
 
                     break;
+//exit
                 case 6:
                     std::cout << "Exiting...\nTemex na to uz nema...\n";
                     exit(0);
