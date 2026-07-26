@@ -399,8 +399,7 @@ void Terminal::deleteTaskInProject(const std::string &title, const
 void Terminal::drawMenu(Project &project) {
     std::string errorMsg;
     unsigned int input;
-
-    while (true) {
+ while (true) {
         Terminal::clearScreen();
 
         std::cout << "      ┌───────────────────────────────┐\n";
@@ -437,14 +436,14 @@ void Terminal::drawMenu(Project &project) {
         if (std::cin.fail()) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            errorMsg = "Invalid input — please enter a number.";
+            errorMsg = "Invalid input — please enter a number. 1";
             continue;
         }
 
         if (input >= 1 && input <= 6) {
             Terminal::clearScreen();
             std::string errorMsg2;
-            unsigned int input2;
+            char input2;
             switch (input) {
 //create task/project
                 case 1:
@@ -479,7 +478,7 @@ void Terminal::drawMenu(Project &project) {
                         if (std::cin.fail()) {
                             std::cin.clear();
                             std::cin.ignore();
-                            errorMsg = "Invalid input — please enter a number.";
+                            errorMsg = "Invalid input — please enter a number. 2";
                             continue;
                         }
 
@@ -537,7 +536,7 @@ void Terminal::drawMenu(Project &project) {
                     if (std::cin.fail()) {
                         std::cin.clear();
                         std::cin.ignore();
-                        errorMsg = "Invalid input — please enter a number.";
+                        errorMsg = "Invalid input — please enter a number. 3";
                         continue;
                     }
 
@@ -550,22 +549,41 @@ void Terminal::drawMenu(Project &project) {
                         case 1:     //view projects
                             Terminal::clearScreen();
                             Terminal::print(load_projects().toStyledString());
-                            std::cout << Terminal::colorize("Press any key to continue...", Style::Dim) << "\n";
+                            std::cout << Terminal::colorize("Type 'q' to quit...", Style::Dim) << "\n";
                             std::cin >> input2;
+                            std::cin.clear();
                             break;
                         case 2:     //view tasks
                             Terminal::clearScreen();
-                            Terminal::print(load_tasks().toStyledString());
-                            std::cout << Terminal::colorize("Press any key to continue...", Style::Dim) << "\n";
+                            for (const auto &task : load_tasks()) {
+                                std::cout << "      ┌───────────────────────────────┐\n";
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Title", Style::Bold, Color::BrightBlue)
+                                    << "\033[16G: "
+                                    << Terminal::colorize(task["title"].asString(), Style::Bold) << std::endl;
+                                std::cout << "      ├───────────────────────────────┤\n";
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Description", Style::Bold) << "  :  " << task["description"].asString() << std::endl;
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Due Date", Style::Bold) << "     :  " << task["dueDate"].asString() << std::endl;
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Status", Style::Bold) << "       :  " << task["status"].asString() << std::endl;
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Priority", Style::Bold) << "     :  " << task["priority"].asString() << std::endl;
+                                std::cout << "      └───────────────────────────────┘\n";
+                                }
+
+                            std::cout << Terminal::colorize("Type 'q' to quit...", Style::Dim) << "\n";
                             std::cin >> input2;
+                            std::cin.clear();
                             break;
                         case 3:     //go back
                             Terminal::clearScreen();
                             Terminal::drawMenu(project);
                             break;
                         default:
-                                std::cout << "Invalid option.\n";
-                                break;
+                            std::cout << "Invalid option.\n";
+                            break;
                     }
                     break;
 //edit tasks/projects
