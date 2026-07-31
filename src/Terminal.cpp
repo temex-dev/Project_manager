@@ -336,7 +336,7 @@ void Terminal::drawInputBox(const Action &action, const Type &type) {
                 << "\033[21G: " << title << "\n";
             std::cout << "      ├───────────────────────────────┤\n";
             std::cout << "      │ "
-                << Terminal::colorize("Title       : ", Style::Bold)
+                << Terminal::colorize("Description : ", Style::Bold)
                 << title << "\n";
             std::cout << "      └───────────────────────────────┘\n";
 
@@ -355,11 +355,22 @@ void Terminal::drawInputBox(const Action &action, const Type &type) {
                 }
             }
 
+            if (desc.empty()) {
+                Terminal::moveCursor(4, 23);
+                std::getline(std::cin, desc);
+                if (desc.empty()) {
+                    errorMessage = "Description is required.";
+                    continue;
+                }
+            }
+
             Project project;
             project.setTitle(title);
+            project.setDescription(desc);
             if (!Terminal::saveProjectToFile(project)) {
                 errorMessage = "Unable to save project to data/projects.json.";
                 title.clear();
+                desc.clear();
                 continue;
             }
 
@@ -556,7 +567,9 @@ void Terminal::drawMenu(Project &project) {
                                     << Terminal::colorize(project["title"].asString(), Style::Bold) << std::endl;
                                 std::cout << "      ├───────────────────────────────┤\n";
                                 std::cout << "      │ "
-                                    << Terminal::colorize("Task", Style::Bold) << "  :  " << "project['description'].asString()" << std::endl;
+                                    << Terminal::colorize("Description", Style::Bold) << " :  " << project["description"].asString() << std::endl;
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Task", Style::Bold) << "        :  " << "project['description'].asString()" << std::endl;
                                 std::cout << "      └───────────────────────────────┘\n";
                                 }
 

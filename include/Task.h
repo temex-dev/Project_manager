@@ -15,7 +15,7 @@ public:
     Task(const std::string &title, const std::string &description, const std::string &dueDate, const Status &status, const Priority &priority) :
         title(title), description(description), dueDate(dueDate), status(status), priority(priority) {}
 
-    // Getters
+// Getters
     std::string getTitle() const { return this->title; }
     std::string getDescription() const { return this->description; }
     std::string getDueDate() const { return this->dueDate; }
@@ -23,6 +23,15 @@ public:
     Priority getPriority() const { return this->priority; }
     Type getType() const { return this->type; }
 
+// Setters
+    void setTitle(const std::string &newTitle) { this->title = newTitle; }
+    void setDescription(const std::string &newDescription) { this->description
+        = newDescription; }
+    void setDueDate(const std::string &newDueDate) { this->dueDate =
+         newDueDate; }
+    void setStatus(const Status &newStatus) { this->status = newStatus; }
+    void setPriority(const Priority &newPriority) { this->priority =
+        newPriority; }
     static std::string jsonEscape(const std::string &value) {
         std::string escaped;
         escaped.reserve(value.size());
@@ -54,15 +63,7 @@ public:
         json += "}";
         return json;
     }
-// Setters
-    void setTitle(const std::string &newTitle) { this->title = newTitle; }
-    void setDescription(const std::string &newDescription) { this->description
-        = newDescription; }
-    void setDueDate(const std::string &newDueDate) { this->dueDate =
-         newDueDate; }
-    void setStatus(const Status &newStatus) { this->status = newStatus; }
-    void setPriority(const Priority &newPriority) { this->priority =
-        newPriority; }
+
 };
 
 

@@ -7,6 +7,7 @@
 class Project {
 private:
     std::string title;
+    std::string description;
     std::vector<Task> tasks;
     Type type = Type::Project;
 public:
@@ -27,6 +28,10 @@ public:
 
     void setTitle(const std::string &newTitle) {
         this->title = newTitle;
+    }
+
+    void setDescription(const std::string &newDesc) {
+        this->description = newDesc;
     }
 
     static std::string jsonEscape(const std::string &value) {

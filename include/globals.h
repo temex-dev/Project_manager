@@ -2,13 +2,13 @@
 #define GLOBALS_H
 #pragma once
 
-#include <iostream>
+#include <iostream> // IWYU pragma: keep
 #include <string>
-#include <optional>
+#include <optional> // IWYU pragma: keep
 #include <map>
-#include <vector>
+#include <vector> // IWYU pragma: keep
 #include <fstream>
-#include <filesystem>
+#include <filesystem> // IWYU pragma: keep
 #include <json/json.h>
 
 enum class Color {
