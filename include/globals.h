@@ -11,7 +11,6 @@
 #include <filesystem>
 #include <json/json.h>
 
-
 enum class Color {
     Black, Red, Green, Yellow, Blue, Magenta, Cyan, White,
     BrightRed, BrightGreen, BrightYellow, BrightBlue

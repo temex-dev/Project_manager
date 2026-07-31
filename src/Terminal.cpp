@@ -548,7 +548,18 @@ void Terminal::drawMenu(Project &project) {
                     switch (input) {
                         case 1:     //view projects
                             Terminal::clearScreen();
-                            Terminal::print(load_projects().toStyledString());
+                            for (const auto &project : load_projects()) {
+                                std::cout << "      ┌───────────────────────────────┐\n";
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Project", Style::Bold, Color::BrightBlue)
+                                    << "\033[16G: "
+                                    << Terminal::colorize(project["title"].asString(), Style::Bold) << std::endl;
+                                std::cout << "      ├───────────────────────────────┤\n";
+                                std::cout << "      │ "
+                                    << Terminal::colorize("Task", Style::Bold) << "  :  " << "project['description'].asString()" << std::endl;
+                                std::cout << "      └───────────────────────────────┘\n";
+                                }
+
                             std::cout << Terminal::colorize("Type 'q' to quit...", Style::Dim) << "\n";
                             std::cin >> input2;
                             std::cin.clear();
@@ -558,7 +569,7 @@ void Terminal::drawMenu(Project &project) {
                             for (const auto &task : load_tasks()) {
                                 std::cout << "      ┌───────────────────────────────┐\n";
                                 std::cout << "      │ "
-                                    << Terminal::colorize("Title", Style::Bold, Color::BrightBlue)
+                                    << Terminal::colorize("Task", Style::Bold, Color::BrightBlue)
                                     << "\033[16G: "
                                     << Terminal::colorize(task["title"].asString(), Style::Bold) << std::endl;
                                 std::cout << "      ├───────────────────────────────┤\n";
@@ -579,7 +590,6 @@ void Terminal::drawMenu(Project &project) {
                             break;
                         case 3:     //go back
                             Terminal::clearScreen();
-                            Terminal::drawMenu(project);
                             break;
                         default:
                             std::cout << "Invalid option.\n";
