@@ -53,11 +53,15 @@ public:
     }
 
     std::string toJson() const {
-        return "{\"title\":\"" + jsonEscape(title) + "\"}";
+        return "{\"title\":\"" + jsonEscape(title) + "\",\"description\":\"" + jsonEscape(description) + "\"}";
     }
 
     std::string getTitle() const {
         return this->title;
+    }
+
+    std::string getDescription() const {
+        return this->description;
     }
 };
 
