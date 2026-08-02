@@ -19,7 +19,7 @@ public:
     static void drawTaskCreateBox(const std::string &title,
         const std::string &desc, const std::string &dueDate,
         const std::string &status, const std::string &priority,
-        const std::string &errorMessage);
+        const std::string &projectName, const std::string &errorMessage);
 
     static void drawTaskEditBox(Task &task, const std::string &errorMessage);
 
@@ -29,9 +29,10 @@ public:
 
     static void createTaskInProject(const std::string &title, const
         std::string &desc, const std::string &dueDate, const Status &status,
-        const Priority &priority, Project &project);
+        const Priority &priority, const std::string &projectName, Project &project);
     static bool saveTaskToFile(const Task &task, const std::optional<std::string> &projectTitle = std::nullopt);
     static bool saveProjectToFile(const Project &project);
+    static bool addTaskToProjectFile(const std::string &projectName, const Task &task);
     static void editTaskInProject(const std::string &title, const
         std::vector<Task> &tasks);
     static void deleteTaskInProject(const std::string &title,const

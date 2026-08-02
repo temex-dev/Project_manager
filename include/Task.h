@@ -8,17 +8,19 @@ private:
     std::string title;
     std::string description;
     std::string dueDate;
+    std::string projectTitle;
     Status status;
     Priority priority;
     Type type = Type::Task;
 public:
-    Task(const std::string &title, const std::string &description, const std::string &dueDate, const Status &status, const Priority &priority) :
-        title(title), description(description), dueDate(dueDate), status(status), priority(priority) {}
+    Task(const std::string &title, const std::string &description, const std::string &dueDate, const Status &status, const Priority &priority, const std::string &projectTitle = "") :
+        title(title), description(description), dueDate(dueDate), projectTitle(projectTitle), status(status), priority(priority) {}
 
 // Getters
     std::string getTitle() const { return this->title; }
     std::string getDescription() const { return this->description; }
     std::string getDueDate() const { return this->dueDate; }
+    std::string getProjectTitle() const { return this->projectTitle; }
     Status getStatus() const { return this->status; }
     Priority getPriority() const { return this->priority; }
     Type getType() const { return this->type; }
@@ -29,9 +31,11 @@ public:
         = newDescription; }
     void setDueDate(const std::string &newDueDate) { this->dueDate =
          newDueDate; }
+    void setProjectTitle(const std::string &newProjectTitle) { this->projectTitle = newProjectTitle; };
     void setStatus(const Status &newStatus) { this->status = newStatus; }
     void setPriority(const Priority &newPriority) { this->priority =
         newPriority; }
+
     static std::string jsonEscape(const std::string &value) {
         std::string escaped;
         escaped.reserve(value.size());

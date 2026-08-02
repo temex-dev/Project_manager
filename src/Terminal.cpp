@@ -82,6 +82,23 @@ static std::string jsonEscape(const std::string &value) {
     return escaped;
 }
 
+static bool writeJsonValueToFile(const std::string &filePath, const Json::Value &value) {
+    std::filesystem::path path(filePath);
+    std::filesystem::create_directories(path.parent_path());
+
+    std::ofstream out(path, std::ios::trunc);
+    if (!out.is_open()) {
+        return false;
+    }
+
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = "";
+    builder["commentStyle"] = "None";
+    builder["emitUTF8"] = true;
+    out << Json::writeString(builder, value);
+    return true;
+}
+
 static bool appendJsonObjectToArrayFile(const std::string &filePath, const std::string &jsonObject) {
     std::filesystem::path path(filePath);
     std::filesystem::create_directories(path.parent_path());
@@ -126,6 +143,42 @@ bool Terminal::saveTaskToFile(const Task &task, const std::optional<std::string>
 
 bool Terminal::saveProjectToFile(const Project &project) {
     return appendJsonObjectToArrayFile(dir + "/projects.json", project.toJson());
+}
+
+bool Terminal::addTaskToProjectFile(const std::string &projectName, const Task &task) {
+    std::filesystem::path path(dir + "/projects.json");
+    std::ifstream in(path);
+    if (!in.is_open()) {
+        return false;
+    }
+
+    Json::Value projects;
+    in >> projects;
+    if (!projects.isArray()) {
+        return false;
+    }
+
+    for (Json::Value &projectEntry : projects) {
+        if (!projectEntry.isObject() || !projectEntry.isMember("title") || !projectEntry["title"].isString()) {
+            continue;
+        }
+
+        if (projectEntry["title"].asString() != projectName) {
+            continue;
+        }
+
+        Json::Value taskValue;
+        taskValue["title"] = task.getTitle();
+
+        if (!projectEntry.isMember("tasks") || !projectEntry["tasks"].isArray()) {
+            projectEntry["tasks"] = Json::Value(Json::arrayValue);
+        }
+
+        projectEntry["tasks"].append(taskValue);
+        return writeJsonValueToFile(path.string(), projects);
+    }
+
+    return false;
 }
 
 void Terminal::print(const std::string &text, const std::optional<std::string> &
@@ -212,7 +265,8 @@ void Terminal::drawInfoBox(const Type &type, const std::string &title, const
 
 void Terminal::drawTaskCreateBox(const std::string &title, const
     std::string &desc, const std::string &dueDate, const std::string &status,
-    const std::string &priority, const std::string &errorMessage) {
+    const std::string &priority, const std::string &projectName,
+    const std::string &errorMessage) {
 
     std::cout << "      ┌───────────────────────────────┐\n";
     std::cout << "      │ "
@@ -240,6 +294,10 @@ void Terminal::drawTaskCreateBox(const std::string &title, const
             priorityColors.at(strPriority.at(priority)).fg, priorityColors.at(strPriority.at(priority)).bg) << "\n";
     }
     else { std::cout << priority << std::endl; }
+
+    std::cout << "      │ "
+        << Terminal::colorize("Project     : ", Style::Bold)
+        << projectName << "\n";
     std::cout << "      └───────────────────────────────┘\n";
 
     if (!errorMessage.empty()) {
@@ -257,14 +315,14 @@ void Terminal::drawTaskEditBox(Task &task, const std::string &errorMessage) {
 void Terminal::drawInputBox(const Action &action, const Type &type, Project &
     project) {
     const std::string typeLabel = typeStr.at(type);
-    std::string title, desc, dueDate, status, priority;
+    std::string title, desc, dueDate, status, priority, projectName;
     std::string errorMessage;
     if (typeLabel == "Task") {
         switch(action) {
             case Action::Create:
                 while(true) {
                     Terminal::clearScreen();
-                    Terminal::drawTaskCreateBox(title, desc, dueDate, status, priority, errorMessage);
+                    Terminal::drawTaskCreateBox(title, desc, dueDate, status, priority, projectName, errorMessage);
                     errorMessage.clear();
 
                     if (title.empty()) {
@@ -302,8 +360,37 @@ void Terminal::drawInputBox(const Action &action, const Type &type, Project &
                         }
                         continue;
                     }
+                    if (projectName.empty()) {
+                        Terminal::moveCursor(8, 23);
+                        std::getline(std::cin, projectName);
+                        projectName = trimString(projectName);
+                        if (projectName.empty()) {
+                            errorMessage = "Project name is required.";
+                            projectName.clear();
+                            continue;
+                        }
+
+                        Json::Value projects = load_projects();
+                        bool projectExists = false;
+                        if (projects.isArray()) {
+                            for (const Json::Value &existingProject : projects) {
+                                if (existingProject.isMember("title") && existingProject["title"].isString() &&
+                                    existingProject["title"].asString() == projectName) {
+                                    projectExists = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!projectExists) {
+                            errorMessage = "Project does not exist in data/projects.json.";
+                            projectName.clear();
+                            continue;
+                        }
+                        continue;
+                    }
                     Terminal::createTaskInProject(title, desc, dueDate,
-                        strStatus.at(status), strPriority.at(priority), project);
+                        strStatus.at(status), strPriority.at(priority), projectName, project);
                     break;
                 }
                 std::cout << "\n      "
@@ -392,11 +479,21 @@ void Terminal::drawInputBox(const Action &action, const Type &type) {
 
 void Terminal::createTaskInProject(const std::string &title, const
     std::string &desc, const std::string &dueDate, const Status &status,
-        const Priority &priority, Project &project) {
+        const Priority &priority, const std::string &projectName, Project &project) {
     Task task(title, desc, dueDate, status, priority);
     project.addTask(task);
-    const std::optional<std::string> projectTitle = project.getTitle().empty() ? std::nullopt : std::make_optional(project.getTitle());
-    if (!Terminal::saveTaskToFile(task, projectTitle)) {
+    const std::optional<std::string> resolvedProjectTitle = projectName.empty()
+        ? (project.getTitle().empty() ? std::nullopt : std::make_optional(project.getTitle()))
+        : std::make_optional(projectName);
+
+    if (resolvedProjectTitle.has_value()) {
+        if (!Terminal::saveTaskToFile(task, resolvedProjectTitle)) {
+            std::cerr << "Warning: unable to save task to data/tasks.json\n";
+        }
+        if (!Terminal::addTaskToProjectFile(resolvedProjectTitle.value(), task)) {
+            std::cerr << "Warning: unable to update project entry in data/projects.json\n";
+        }
+    } else if (!Terminal::saveTaskToFile(task, std::nullopt)) {
         std::cerr << "Warning: unable to save task to data/tasks.json\n";
     }
 }
@@ -575,8 +672,12 @@ void Terminal::drawMenu(Project &project) {
                                     std::cout << "      ├───────────────────────────────┤\n";
                                     std::cout << "      │ "
                                         << Terminal::colorize("Description", Style::Bold) << " :  " << project["description"].asString() << std::endl;
-                                    std::cout << "      │ "
-                                        << Terminal::colorize("Tasks", Style::Bold) << "       :  " << "project['description'].asString()" << std::endl;
+                                    int taskIndex = 1;
+                                    for (const auto &task : project["tasks"]) {
+                                        std::cout << "      │ "
+                                            << Terminal::colorize("Task ", Style::Bold) << Terminal::colorize(std::to_string(taskIndex), Style::Bold) << "      :  " << task["title"].asString() << std::endl;
+                                        ++taskIndex;
+                                    }
                                     std::cout << "      └───────────────────────────────┘\n";
                                 }
 
@@ -600,6 +701,8 @@ void Terminal::drawMenu(Project &project) {
                                         << Terminal::colorize("Status", Style::Bold) << "       :  " << task["status"].asString() << std::endl;
                                     std::cout << "      │ "
                                         << Terminal::colorize("Priority", Style::Bold) << "     :  " << task["priority"].asString() << std::endl;
+                                    std::cout << "      │ "
+                                        << Terminal::colorize("Project", Style::Bold) << "      :  " << task["projectTitle"].asString() << std::endl;
                                     std::cout << "      └───────────────────────────────┘\n";
                                 }
 
