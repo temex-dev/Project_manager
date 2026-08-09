@@ -1,5 +1,6 @@
 #include "../include/Terminal.h"
 #include "globals.h"
+#include <sstream>
 
 const std::string dir = DATA_DIR;
 
@@ -92,49 +93,41 @@ static bool writeJsonValueToFile(const std::string &filePath, const Json::Value 
     }
 
     Json::StreamWriterBuilder builder;
-    builder["indentation"] = "";
+    builder["indentation"] = "    ";
     builder["commentStyle"] = "None";
     builder["emitUTF8"] = true;
     out << Json::writeString(builder, value);
     return true;
 }
 
+static bool parseJsonObject(const std::string &jsonString, Json::Value &value) {
+    std::istringstream in(jsonString);
+    in >> value;
+    return !in.fail() && value.isObject();
+}
+
 static bool appendJsonObjectToArrayFile(const std::string &filePath, const std::string &jsonObject) {
     std::filesystem::path path(filePath);
     std::filesystem::create_directories(path.parent_path());
 
-    std::string content;
+    Json::Value array(Json::arrayValue);
     if (std::filesystem::exists(path)) {
         std::ifstream in(path);
-        content.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+        if (in.is_open()) {
+            in >> array;
+            if (!array.isArray()) {
+                array = Json::Value(Json::arrayValue);
+            }
+        }
     }
 
-    const std::string trimmed = trimString(content);
-    std::string output;
-
-    if (trimmed.empty()) {
-        output = "[" + jsonObject + "]";
-    } else {
-        const auto insertPos = trimmed.find_last_not_of(" \t\r\n");
-        if (insertPos == std::string::npos || trimmed[insertPos] != ']') {
-            return false;
-        }
-
-        output = trimmed.substr(0, insertPos);
-        if (output.back() == '[') {
-            output += jsonObject;
-        } else {
-            output += "," + jsonObject;
-        }
-        output += "]";
-    }
-
-    std::ofstream out(path, std::ios::trunc);
-    if (!out.is_open()) {
+    Json::Value objectValue;
+    if (!parseJsonObject(jsonObject, objectValue)) {
         return false;
     }
-    out << output;
-    return true;
+
+    array.append(objectValue);
+    return writeJsonValueToFile(path.string(), array);
 }
 
 bool Terminal::saveTaskToFile(const Task &task, const std::optional<std::string> &projectTitle) {
@@ -729,7 +722,52 @@ void Terminal::drawMenu(Project &project) {
                     break;
 //help
                 case 5:
+                    Terminal::clearScreen();
+                    std::cout << "      ┌───────────────────────────────┐\n";
+                    std::cout << "      │ " << Terminal::colorize("Help   ", Style::Bold, Color::BrightBlue) << ":  Project             │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ Projects store tasks.         │\n";
+                    std::cout << "      │ title      : project name     │\n";
+                    std::cout << "      │ description: what it is for   │\n";
+                    std::cout << "      │ Project must exist before     │\n";
+                    std::cout << "      │    tasks.                     │\n";
+                    std::cout << "      └───────────────────────────────┘\n";
 
+                    std::cout << "      ┌───────────────────────────────┐\n";
+                    std::cout << "      │ " << Terminal::colorize("Help   ", Style::Bold, Color::BrightBlue) << ":  Task                │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ Tasks belong to a project.    │\n";
+                    std::cout << "      │ title      : task name        │\n";
+                    std::cout << "      │ description: task details     │\n";
+                    std::cout << "      │ due date   : e.g. 2026-08-09  │\n";
+                    std::cout << "      │ status     : Todo, InProgress,│\n";
+                    std::cout << "      │               Completed       │\n";
+                    std::cout << "      │ priority   : Low, Medium, High│\n";
+                    std::cout << "      └───────────────────────────────┘\n";
+
+                    std::cout << "      ┌───────────────────────────────┐\n";
+                    std::cout << "      │ " << Terminal::colorize("Help   ", Style::Bold, Color::BrightBlue) << ":  Workflow            │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ 1) Create a project first.    │\n";
+                    std::cout << "      │ 2) Create tasks and assign    │\n";
+                    std::cout << "      │    them to the saved project. │\n";
+                    std::cout << "      │ 3) View Projects or View Tasks│\n";
+                    std::cout << "      │    to inspect saved data.     │\n";
+                    std::cout << "      └───────────────────────────────┘\n";
+
+                    std::cout << "      ┌───────────────────────────────┐\n";
+                    std::cout << "      │ " << Terminal::colorize("Help   ", Style::Bold, Color::BrightBlue) << ":  Tips                │\n";
+                    std::cout << "      ├───────────────────────────────┤\n";
+                    std::cout << "      │ To tick off a task, simply    │\n";
+                    std::cout << "      │     delete it completly       │\n";
+                    std::cout << "      │ When deleting a project, it   │\n";
+                    std::cout << "      │     delete all associated     │\n";
+                    std::cout << "      │     tasks                     │\n";
+                    std::cout << "      └───────────────────────────────┘\n";
+
+                    char dummy;
+                    std::cout << "\n      Press Enter to continue...";
+                    std::cin.get(dummy);
                     break;
 //exit
                 case 6:

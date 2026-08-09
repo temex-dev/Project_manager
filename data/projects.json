@@ -1,25 +1,12 @@
 [
     {
-        "description": "stuff",
-        "tasks":
+        "description" : "PICO",
+        "tasks" : 
         [
             {
-                "title": "Test Task 1"
-            },
-            {
-                "title": "Test Task 2"
+                "title" : "nevim vole"
             }
         ],
-        "title": "Test Project 1"
-    },
-    {
-        "description": "desc stuff",
-        "tasks":
-        [
-            {
-                "title": "Test Task 3"
-            }
-        ],
-        "title": "Test Project 2"
+        "title" : "IDK"
     }
 ]

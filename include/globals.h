@@ -81,15 +81,47 @@ const std::map<Type, std::string> typeStr = {
 
 inline Json::Value load_projects() {
     std::ifstream projects_file(DATA_DIR "/projects.json", std::ifstream::binary);
-    Json::Value projects;
-    projects_file >> projects;
+    Json::Value projects(Json::arrayValue);
+    if (!projects_file.is_open()) {
+        return projects;
+    }
+
+    std::string content((std::istreambuf_iterator<char>(projects_file)), std::istreambuf_iterator<char>());
+    if (content.find_first_not_of(" \t\r\n") == std::string::npos) {
+        return projects;
+    }
+
+    Json::CharReaderBuilder readerBuilder;
+    readerBuilder["collectComments"] = false;
+    std::string errors;
+    std::istringstream stream(content);
+    if (!Json::parseFromStream(readerBuilder, stream, &projects, &errors) || !projects.isArray()) {
+        return Json::Value(Json::arrayValue);
+    }
+
     return projects;
 }
 
 inline Json::Value load_tasks() {
     std::ifstream tasks_file(DATA_DIR "/tasks.json", std::ifstream::binary);
-    Json::Value tasks;
-    tasks_file >> tasks;
+    Json::Value tasks(Json::arrayValue);
+    if (!tasks_file.is_open()) {
+        return tasks;
+    }
+
+    std::string content((std::istreambuf_iterator<char>(tasks_file)), std::istreambuf_iterator<char>());
+    if (content.find_first_not_of(" \t\r\n") == std::string::npos) {
+        return tasks;
+    }
+
+    Json::CharReaderBuilder readerBuilder;
+    readerBuilder["collectComments"] = false;
+    std::string errors;
+    std::istringstream stream(content);
+    if (!Json::parseFromStream(readerBuilder, stream, &tasks, &errors) || !tasks.isArray()) {
+        return Json::Value(Json::arrayValue);
+    }
+
     return tasks;
 }
 #endif // GLOBALS_H
